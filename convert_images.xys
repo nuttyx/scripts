@@ -1,0 +1,43 @@
+"Convert Images"
+  // Converts STATIC images to JPEG, short size will be REDUCED (never scaled up) to 2560 px, quality is set to 80
+  // It WILL REPLACE the older file (it deletes the previous file, whether it was JPEG or not) only if the FILESIZE is SMALLER (by 2% or more)
+  // It uses windows temp folder to create the new image.
+  
+  // Adjust paths nad other fixed value if necesary:
+  $binary = quote("c:\Program Files\ImageMagick\magick.exe");
+  $cmd = quote("%windir%\system32\cmd.exe");
+  $quality = 80;
+  $minlength = 2560;
+  
+  $SelectedItems = get("SelectedItemsPathNames", "|");
+  $outerr = "";
+  foreach($Item, $SelectedItems, "|") {
+    $ext = regexreplace($Item,"^.*\.","");
+    // Ignore unknown extensions
+    if (($ext == "jpg") || ($ext == "jpeg") || ($ext == "png") || ($ext == "tif") || ($ext == "bmp")) {
+      $tmpout = new("%temp%\<date yyyymmddhhnnss>.jpg");
+      $run = quote($binary." ".quote($Item)." -resize ".$minlength."x".$minlength."^^^> -quality ".$quality." ". quote($tmpout));
+      run $cmd." /C ".$run, "%temp%\", 2, 0;
+      $prevs = filesize($Item);
+	  $posts = filesize($tmpout);
+      if (($posts > 0) && (($prevs / $posts) > 1.02)) {
+        delete 0, 0, $Item;
+        rename b, regexreplace($Item,"\.[^.]{1,5}$",""), , $tmpout, 8;
+      } else {
+        delete 0, 0, $tmpout;
+        $outerr= <<<EOF
+$outerr
+$Item - Actual: $prevs - New: $posts
+EOF
+
+      }
+    } else {
+      $outerr= <<<EOF
+$outerr
+$Item - Imagetype ($ext) not supported
+EOF
+    }
+  }
+  if ($outerr != "") {
+    text "$outerr", 1050, 500, "Files that couldn't be reduced:", w;
+  }
