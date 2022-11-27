@@ -1,4 +1,6 @@
 "Convert Images"
+  // XYPlorer script
+  // NEEDS imagemagick installed
   // Converts STATIC images to JPEG, short size will be REDUCED (never scaled up) to 2560 px, quality is set to 80
   // It WILL REPLACE the older file (it deletes the previous file, whether it was JPEG or not) only if the FILESIZE is SMALLER (by 2% or more)
   // It uses windows temp folder to create the new image.
