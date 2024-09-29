@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+# A simple script to connect to a TLS enabled server and extract the server certificate and print basic information. Mainly used to check Issuer, SAN and dates
+
 if [[ $# -lt 1 ]]; then
   echo "$0 needs (at least) an argument (domain or domain:port) to work"
   exit 4
